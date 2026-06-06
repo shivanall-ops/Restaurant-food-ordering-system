@@ -1,11 +1,17 @@
-# Python Calculator
-My first python project while learning git + Github.
+# Python Beginner Projects
+This repository contains python beginner projects:
 
-## Features
-- Add, Subtract, Multiply, Divide
-- Power function
-- Handles division by zero errors
-- Input validation for errors
+## projects
+- calculator
+- atm simulation
+- student grade calculator
+- to-do list
+
+##Technologies
+-pYTHON
+-Git
+-GITHUB
+-WINDSURF
 
 ##How to Run
 ```bash

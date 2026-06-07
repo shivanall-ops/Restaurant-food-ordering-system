@@ -6,6 +6,8 @@ This repository contains python beginner projects:
 - atm simulation
 - student grade calculator
 - to-do list
+- library management system
+- password generator
 
 ##Technologies
 -pYTHON

@@ -78,7 +78,26 @@ def add_street_light(light_id, area_name, pole_number,
 
     finally:
         conn.close()
+def view_all_light():
+    try:
+        conn = sqlite3.connect(DB_NAME)
+        cursor = conn.cursor()
 
+        cursor.execute("SELECT * FROM street_light")
+        records = cursor.fetchall()
+
+        if records:
+            print("\n--- Street Light Records ---")
+            for record in records:
+                print(record)
+        else:
+            print("No street lights found.")
+
+    except sqlite3.Error as e:
+        print(f"Database error: {e}")
+
+    finally:
+        conn.close()
 
 if __name__ == "__main__":
     create_database()

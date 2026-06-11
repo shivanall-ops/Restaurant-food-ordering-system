@@ -1,4 +1,4 @@
-from database import add_street_light
+from database import create_database, add_street_light, view_all_light
 # Smart Street Light Energy Waste Detection System
 # Main program with menu-driven interface
 
@@ -7,7 +7,7 @@ def main():
     Main function that displays the menu and handles user interactions
     for the Smart Street Light System.
     """
-    
+    create_database()
     # Main program loop - continues until user chooses to exit
     while True:
         # Display the menu
@@ -47,7 +47,7 @@ def main():
                     status
     )
             elif choice == 2:
-                print("View Street Light feature selected.")
+                view_all_light()
             elif choice == 3:
                 print("Search Street Light feature selected.")
             elif choice == 4:

@@ -127,5 +127,26 @@ def search_street_light(light_id):
 
     finally:
         conn.close()
+def update_light_status(light_id, status):
+    try:
+        conn = sqlite3.connect(DB_NAME)
+        cursor = conn.cursor()
+
+        cursor.execute(
+            "UPDATE street_light SET status = ? WHERE light_id = ?",
+            (status, light_id)
+        )
+
+        if cursor.rowcount > 0:
+            conn.commit()
+            print("Street Light Status Updated Successfully.")
+        else:
+            print("Street Light ID not found.")
+
+    except sqlite3.Error as e:
+        print(f"Database error: {e}")
+
+    finally:
+        conn.close()        
 if __name__ == "__main__":
     create_database()

@@ -1,4 +1,4 @@
-from database import create_database, add_street_light, view_all_light
+from database import create_database, add_street_light, view_all_light, search_street_light
 # Smart Street Light Energy Waste Detection System
 # Main program with menu-driven interface
 
@@ -49,7 +49,8 @@ def main():
             elif choice == 2:
                 view_all_light()
             elif choice == 3:
-                print("Search Street Light feature selected.")
+                light_id = input("Enter Light ID to search: ")
+                search_street_light(light_id)
             elif choice == 4:
                 print("Update Light Status feature selected.")
             elif choice == 5:

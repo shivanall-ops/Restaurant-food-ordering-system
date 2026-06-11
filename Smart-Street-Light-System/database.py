@@ -98,6 +98,34 @@ def view_all_light():
 
     finally:
         conn.close()
+def search_street_light(light_id):
+    try:
+        conn = sqlite3.connect(DB_NAME)
+        cursor = conn.cursor()
 
+        cursor.execute(
+            "SELECT * FROM street_light WHERE light_id = ?",
+            (light_id,)
+        )
+
+        record = cursor.fetchone()
+
+        if record:
+            print("\n===== STREET LIGHT DETAILS =====")
+            print(f"Light ID: {record[0]}")
+            print(f"Area Name: {record[1]}")
+            print(f"Pole Number: {record[2]}")
+            print(f"Latitude: {record[3]}")
+            print(f"Longitude: {record[4]}")
+            print(f"Installation Date: {record[5]}")
+            print(f"Status: {record[6]}")
+        else:
+            print("Street Light not found.")
+
+    except sqlite3.Error as e:
+        print(f"Database error: {e}")
+
+    finally:
+        conn.close()
 if __name__ == "__main__":
     create_database()

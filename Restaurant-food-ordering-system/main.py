@@ -1,206 +1,252 @@
 """
-Restaurant Food Ordering System - Main Application
+Restaurant Table Reservation & Food Pre-Ordering System
+Main Module
 
-This module provides a command-line interface for the restaurant food ordering system.
-It allows users to place orders, view orders, and generate bills.
+This module provides the user interface for the restaurant reservation system.
+It handles menu display, user input, and calls appropriate database functions.
 """
 
-from database import create_database, place_order, view_orders, generate_bill
+from database import (
+    create_database,
+    reserve_table,
+    view_reservations,
+    pre_order_food,
+    generate_bill
+)
 
 
 def display_menu():
     """
-    Display the main menu options for the Restaurant Food Ordering System.
+    Display the main menu for the Table Reservation System.
+    
+    Shows all available options for the user to interact with the system.
     """
-    print("\n" + "=" * 40)
-    print("RESTAURANT FOOD ORDERING SYSTEM")
-    print("=" * 40)
-    print("1. Place Order")
-    print("2. View All Orders")
-    print("3. View Specific Order")
+    print("\n" + "=" * 36)
+    print("TABLE RESERVATION SYSTEM")
+    print("=" * 36)
+    print("1. Reserve Table")
+    print("2. View Reservations")
+    print("3. Pre-Order Food")
     print("4. Generate Bill")
     print("5. Exit")
-    print("=" * 40)
+    print("=" * 36)
 
 
-def place_order_menu():
+def get_valid_input(prompt, input_type=str, validation_func=None):
     """
-    Handle the place order menu option.
+    Get validated input from the user.
     
-    Prompts the user for customer name, table number, and multiple food items
-    with quantities. Validates input and places the order using the database function.
+    Args:
+        prompt (str): The prompt message to display
+        input_type (type): The type to convert input to (default: str)
+        validation_func (function): Optional validation function
+    
+    Returns:
+        The validated input of specified type, or None if cancelled
     """
-    print("\n--- Place Order ---")
+    while True:
+        try:
+            user_input = input(prompt)
+            converted_input = input_type(user_input)
+            
+            if validation_func and not validation_func(converted_input):
+                print("Invalid input. Please try again.")
+                continue
+                
+            return converted_input
+        except ValueError:
+            print(f"Please enter a valid {input_type.__name__}.")
+        except KeyboardInterrupt:
+            print("\nOperation cancelled.")
+            return None
+
+
+def validate_positive_number(value):
+    """
+    Validate that a number is positive.
+    
+    Args:
+        value (int or float): The value to validate
+    
+    Returns:
+        bool: True if value is positive, False otherwise
+    """
+    return value > 0
+
+
+def reserve_table_menu():
+    """
+    Handle the table reservation process.
+    
+    Prompts the user for customer details and booking information,
+    then calls the reserve_table function to create the reservation.
+    """
+    print("\n--- Reserve a Table ---")
     
     try:
         # Get customer name
-        customer_name = input("Enter customer name: ").strip()
+        customer_name = get_valid_input("Enter customer name: ")
         if not customer_name:
-            print("Error: Customer name cannot be empty.")
             return
         
-        # Get table number with validation
-        while True:
-            table_input = input("Enter table number: ").strip()
-            try:
-                table_number = int(table_input)
-                if table_number <= 0:
-                    print("Error: Table number must be a positive integer.")
-                    continue
-                break
-            except ValueError:
-                print("Error: Please enter a valid integer for table number.")
+        # Get phone number
+        phone_number = get_valid_input("Enter phone number: ")
+        if not phone_number:
+            return
         
-        # Get menu items and quantities
-        items = []
-        print("\nEnter menu items (enter 'done' when finished):")
-        print("Available items: Burger, Pizza, Ice Cream")
+        # Get table number
+        table_number = get_valid_input(
+            "Enter table number: ",
+            input_type=int,
+            validation_func=validate_positive_number
+        )
+        if table_number is None:
+            return
         
-        while True:
-            item_name = input("  Item name (or 'done' to finish): ").strip()
-            
-            # Check if user wants to finish adding items
-            if item_name.lower() == 'done':
-                if not items:
-                    print("Error: At least one item must be added to place an order.")
-                    continue
-                break
-            
-            if not item_name:
-                print("Error: Item name cannot be empty.")
-                continue
-            
-            # Get quantity with validation
-            while True:
-                quantity_input = input(f"  Quantity for {item_name}: ").strip()
-                try:
-                    quantity = int(quantity_input)
-                    if quantity <= 0:
-                        print("Error: Quantity must be a positive integer.")
-                        continue
-                    break
-                except ValueError:
-                    print("Error: Please enter a valid integer for quantity.")
-            
-            # Add item to the list as a tuple
-            items.append((item_name, quantity))
-            print(f"  Added: {item_name} x{quantity}")
+        # Get booking date
+        booking_date = get_valid_input("Enter booking date (YYYY-MM-DD): ")
+        if not booking_date:
+            return
         
-        # Place the order
-        order_id = place_order(customer_name, table_number, items)
+        # Get booking time
+        booking_time = get_valid_input("Enter booking time (HH:MM): ")
+        if not booking_time:
+            return
         
-        if order_id:
-            print(f"\nSuccess: Order placed successfully with Order ID: {order_id}")
+        # Call the reserve_table function
+        booking_id = reserve_table(
+            customer_name,
+            phone_number,
+            table_number,
+            booking_date,
+            booking_time
+        )
+        
+        if booking_id:
+            print(f"\nReservation successful! Your Booking ID is: {booking_id}")
         else:
-            print("\nError: Failed to place order. Please try again.")
-    
-    except KeyboardInterrupt:
-        print("\n\nOrder placement cancelled by user.")
+            print("\nReservation failed. Please try again.")
+            
     except Exception as e:
-        print(f"\nError: An unexpected error occurred: {e}")
+        print(f"\nAn error occurred during reservation: {e}")
 
 
-def view_specific_order_menu():
+def pre_order_food_menu():
     """
-    Handle the view specific order menu option.
+    Handle the food pre-ordering process.
     
-    Prompts the user for an Order ID and displays the details of that specific order.
-    Validates the Order ID input.
+    Prompts the user for booking ID and allows multiple food items to be ordered,
+    then calls the pre_order_food function for each item.
     """
-    print("\n--- View Specific Order ---")
+    print("\n--- Pre-Order Food ---")
     
     try:
-        # Get Order ID with validation
-        while True:
-            order_id_input = input("Enter Order ID: ").strip()
-            try:
-                order_id = int(order_id_input)
-                if order_id <= 0:
-                    print("Error: Order ID must be a positive integer.")
-                    continue
-                break
-            except ValueError:
-                print("Error: Please enter a valid integer for Order ID.")
+        # Get booking ID
+        booking_id = get_valid_input(
+            "Enter Booking ID: ",
+            input_type=int,
+            validation_func=validate_positive_number
+        )
+        if booking_id is None:
+            return
         
-        # View the specific order
-        view_orders(order_id)
-    
-    except KeyboardInterrupt:
-        print("\n\nView order cancelled by user.")
+        # Allow multiple food items
+        while True:
+            print("\nEnter food item details (or type 'done' to finish):")
+            
+            # Get food item name
+            food_name = get_valid_input("Enter food item name: ")
+            if not food_name or food_name.lower() == 'done':
+                break
+            
+            # Get quantity
+            quantity = get_valid_input(
+                "Enter quantity: ",
+                input_type=int,
+                validation_func=validate_positive_number
+            )
+            if quantity is None:
+                continue
+            
+            # Call the pre_order_food function
+            success = pre_order_food(booking_id, food_name, quantity)
+            
+            if success:
+                print(f"Added {quantity} x {food_name} to your order.")
+            else:
+                print(f"Failed to add {food_name}. Please check if the item exists in the menu.")
+        
+        print("\nPre-order process completed.")
+        
     except Exception as e:
-        print(f"\nError: An unexpected error occurred: {e}")
+        print(f"\nAn error occurred during pre-ordering: {e}")
 
 
 def generate_bill_menu():
     """
-    Handle the generate bill menu option.
+    Handle the bill generation process.
     
-    Prompts the user for an Order ID and generates a bill for that order.
-    Validates the Order ID input.
+    Prompts the user for booking ID and calls the generate_bill function
+    to display the bill details.
     """
     print("\n--- Generate Bill ---")
     
     try:
-        # Get Order ID with validation
-        while True:
-            order_id_input = input("Enter Order ID: ").strip()
-            try:
-                order_id = int(order_id_input)
-                if order_id <= 0:
-                    print("Error: Order ID must be a positive integer.")
-                    continue
-                break
-            except ValueError:
-                print("Error: Please enter a valid integer for Order ID.")
+        # Get booking ID
+        booking_id = get_valid_input(
+            "Enter Booking ID: ",
+            input_type=int,
+            validation_func=validate_positive_number
+        )
+        if booking_id is None:
+            return
         
-        # Generate the bill
-        bill = generate_bill(order_id)
+        # Call the generate_bill function
+        generate_bill(booking_id)
         
-        if bill:
-            print(f"\nSuccess: Bill generated for Order ID: {order_id}")
-        else:
-            print(f"\nError: Failed to generate bill for Order ID: {order_id}")
-    
-    except KeyboardInterrupt:
-        print("\n\nBill generation cancelled by user.")
     except Exception as e:
-        print(f"\nError: An unexpected error occurred: {e}")
+        print(f"\nAn error occurred during bill generation: {e}")
 
 
 def main():
     """
-    Main function to run the Restaurant Food Ordering System.
+    Main function to run the Table Reservation System.
     
-    Initializes the database and runs the main menu loop until the user
-    chooses to exit. Uses match-case for menu option handling.
+    Initializes the database and runs the main menu loop using match-case
+    for option selection. Continues until the user chooses to exit.
     """
-    # Initialize the database
-    print("Initializing Restaurant Food Ordering System...")
+    # Initialize database when application starts
+    print("Initializing database...")
     create_database()
-    print("System initialized successfully.\n")
     
     # Main menu loop
     while True:
         display_menu()
-        choice = input("Enter your choice: ").strip()
         
-        # Handle menu selection using match-case
+        # Get user choice
+        choice = input("Enter your choice: ")
+        
+        # Use match-case for option selection
         match choice:
             case "1":
-                place_order_menu()
+                reserve_table_menu()
+            
             case "2":
-                print("\n--- View All Orders ---")
-                view_orders()
+                view_reservations()
+            
             case "3":
-                view_specific_order_menu()
+                pre_order_food_menu()
+            
             case "4":
                 generate_bill_menu()
+            
             case "5":
-                print("\nThank you for using Restaurant Food Ordering System")
+                print("\nThank you for using Table Reservation System!")
                 print("Goodbye!")
                 break
+            
             case _:
-                print("Invalid choice. Please try again.")
+                print("\nInvalid choice. Please enter a number between 1 and 5.")
 
 
 if __name__ == "__main__":

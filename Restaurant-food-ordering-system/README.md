@@ -1,91 +1,56 @@
-# Restaurant Food Ordering System
+# Restaurant Table Reservation & Food Pre-Ordering System
 
-## Project Overview
-The Restaurant Food Ordering System is a Python-based application that helps manage restaurant orders efficiently. It allows users to place orders, view order details, and generate bills using an SQLite database.
+## Overview
+A Python and SQLite-based application that allows customers to reserve restaurant tables and pre-order food before arriving at the restaurant.
 
 ## Features
-- Create and manage the restaurant database using SQLite.
-- Store menu items with prices and descriptions.
-- Place customer orders with multiple food items.
-- View all orders or search for a specific order.
-- Generate detailed bills with tax calculation.
-- Automatically update order status after bill generation.
-- Menu-driven interface for easy interaction.
+- Table Reservation
+- View Reservations
+- Food Pre-Ordering
+- Bill Generation
+- SQLite Database Integration
 
 ## Technologies Used
-- Python 3
+- Python
 - SQLite
-- Windsurf IDE
-- Git & GitHub
+- SQL
+- Match-Case (Switch Case Style)
 
 ## Project Structure
-```
-Restaurant-Food-Ordering-System/
-│
-├── main.py
+
+```text
 ├── database.py
-├── README.md
-├── .gitignore
+├── main.py
+├── restaurant_reservation.db
+└── README.md
 ```
 
-## Database Tables
-### 1. menu_items
-Stores restaurant menu information.
+## Menu Options
 
-Fields:
-- id
-- name
-- category
-- price
-- description
-
-### 2. orders
-Stores customer order details.
-
-Fields:
-- id
-- customer_name
-- table_number
-- order_date
-- status
-
-### 3. order_items
-Stores ordered items for each order.
-
-Fields:
-- id
-- order_id
-- menu_item_id
-- quantity
-
-## How to Run the Project
-
-1. Clone the repository:
-```
-git clone <repository-url>
-```
-
-2. Navigate to the project folder:
-```
-cd Restaurant-Food-Ordering-System
-```
-
-3. Run the application:
-```
-python main.py
+```text
+1. Reserve Table
+2. View Reservations
+3. Pre-Order Food
+4. Generate Bill
+5. Exit
 ```
 
 ## Sample Menu
-- Burger
-- Pizza
-- Ice Cream
 
-## Future Enhancements
-- Add a graphical user interface (GUI) using Tkinter.
-- Integrate online payment functionality.
-- Implement user authentication for administrators.
-- Generate downloadable PDF bills.
-- Add a search feature for orders.
+```text
+Burger     ₹150
+Pizza      ₹250
+Pasta      ₹180
+Coffee     ₹80
+Ice Cream  ₹100
+```
+
+## How to Run
+
+```bash
+python main.py
+```
 
 ## Author
-Shiva 
+
+Shiva
